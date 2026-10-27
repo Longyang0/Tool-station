@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SocialPost Maker</title>
+    <script src="https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.5/dist/index.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+        }
+        body {
+            background-color: #f0f2f5;
+            color: #222;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+        header {
+            background: linear-gradient(135deg, #6b21a8, #ec4899);
+            color: white;
+            padding: 32px 0;
+            text-align: center;
+            border-radius: 0 0 24px 24px;
+            box-shadow: 0 4px 16px rgba(107, 33, 168, 0.25);
+        }
+        h1 {
+            font-size: 34px;
+            margin-bottom:10px;
+            font-weight:700;
+        }
+        .subtitle{
+            opacity:0.9;
+            font-size:17px;
+        }
+        .back-home {
+            position: fixed;
+            top:24px;
+            left:24px;
+            background: #ffffff;
+            color:#333;
+            text-decoration: none;
+            font-size:16px;
+            font-weight:500;
+            padding:10px 18px;
+            border-radius:999px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+            z-index:999;
+            transition: all 0.2s ease;
+        }
+        .back-home:hover{
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.18);
+        }
+        .back-home::before{
+            content:"← ";
+        }
+        .main-wrap{
+            display:grid;
+            grid-template-columns: 1fr 1fr;
+            gap:28px;
+            margin-top:36px;
+        }
+        .card{
+            background:white;
+            padding:28px;
+            border-radius:20px;
+            box-shadow:0 6px 20px rgba(0,0,0,0.08);
+            transition:0.2s;
+        }
+        .card:hover{
+            box-shadow:0 8px 24px rgba(0,0,0,0.10);
+        }
+        .card h2{
+            margin-bottom:18px;
+            color:#6b21a8;
+            font-size:22px;
+        }
+        button{
+            background: linear-gradient(135deg, #6b21a8, #ec4899);
+            color:white;
+            border:none;
+            padding:12px 22px;
+            border-radius:12px;
+            cursor:pointer;
+            font-size:16px;
+            font-weight:500;
+            margin:8px 6px;
+            transition: all 0.2s ease;
+        }
+        button:hover{
+            transform: translateY(-2px);
+            box-shadow:0 5px 14px rgba(107, 33, 168,0.3);
+        }
+        .template-item{
+            display:inline-block;
+            border:1.5px solid #ddd;
+            padding:10px 14px;
+            border-radius:12px;
+            margin:8px 6px;
+            cursor:pointer;
+            transition:0.2s;
+        }
+        .template-item:hover{
+            border-color:#6b21a8;
+            background-color:#f8f4fc;
+        }
+        .hashtag-box{
+            margin-top:14px;
+            background:#f7f7f9;
+            padding:16px;
+            border-radius:14px;
+        }
+        .hashtag-item{
+            display:inline-block;
+            background:#ede4f8;
+            padding:6px 10px;
+            border-radius:8px;
+            margin:5px;
+            font-size:14px;
+            color:#6b21a8;
+        }
+        input, textarea, select{
+            width:100%;
+            padding:13px;
+            border:1.5px solid #ddd;
+            border-radius:12px;
+            margin:12px 0;
+            font-size:15px;
+        }
+        input:focus, textarea:focus{
+            outline:none;
+            border-color:#6b21a8;
+        }
+        #previewCanvas{
+            border:2px solid #eee;
+            background:#fff;
+            max-width:100%;
+            border-radius:12px;
+            cursor:move;
+        }
+        .tag-category-btn{
+            display:inline-block;
+            border:1.5px solid #6b21a8;
+            padding:8px 12px;
+            border-radius:10px;
+            margin:6px 4px;
+            cursor:pointer;
+            transition:0.2s;
+        }
+        .tag-category-btn.active{
+            background:#6b21a8;
+            color:white;
+        }
+        .tag-category-btn:hover:not(.active){
+            background:#f8f4fc;
+        }
+        label{
+            font-weight:500;
+            color:#444;
+        }
+        .loading{
+            color:#6b21a8;
+            font-weight:bold;
+        }
+        .draft-buttons{
+            margin-top:10px;
+        }
+        @media (max-width:768px){
+            .main-wrap{
+                grid-template-columns: 1fr;
+            }
+            h1{
+                font-size:26px;
+            }
+            .back-home{
+                top:12px;
+                left:12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a class="back-home" href="index.html">Back Home</a >
+    <header>
+        <div class="container">
+            <h1>SocialPost Maker</h1>
+            <div class="subtitle">Create posts for TikTok, Instagram & Facebook | One Time Purchase</div>
+        </div>
+    </header>
+    <div class="container">
+        <div class="main-wrap">
+            <div class="card">
+                <h2>1. Choose Template Size</h2>
+                <div class="template-item" onclick="setCanvasSize(1080,1080)">Instagram Post 1080×1080</div>
+                <div class="template-item" onclick="setCanvasSize(1080,1920)">Instagram / TikTok Story 1080×1920</div>
+                <div class="template-item" onclick="setCanvasSize(1200,630)">Facebook Post 1200×630</div>
+                <div class="template-item" onclick="setCanvasSize(1080,1350)">Instagram Reels Cover</div>
+                <div class="template-item" onclick="setCanvasSize(1280,720)">YouTube Thumbnail</div>
+                <div class="template-item" onclick="setCanvasSize(800,800)">Etsy / Product Square</div>
+
+                <h2 style="margin-top:24px;">2. Image Editor & Filters</h2>
+                <!-- 隐藏原生文件输入框 -->
+<h3>Upload Image</h3>
+<div class="file-area">
+    <button class="file-btn" onclick="document.getElementById('imgUpload').click()">Choose File</button>
+    <span id="fileDisplayText">No file selected</span>
+</div>
+<!-- 唯一的文件输入框 -->
+<input type="file" id="imgUpload" class="file-hidden-input" accept="image/*" onchange="loadImage(event)" style="opacity:0;position:absolute;width:1px;height:1px;">
+
+<label>Add New Text</label>
+<input type="text" id="textInput" placeholder="Type your post text">
+<label>Text Color</label>
+<input type="color" id="colorPicker" value="#ffffff">
+<label>Text Size: <span id="textSizeVal">48</span>px</label>
+<input type="range" id="textSizeSlider" min="12" max="120" value="48" oninput="updateTextSize()">
+<button onclick="addText()">Add Text To Canvas</button>
+<p style="font-size:14px;color:#666;">💡 You can drag text on canvas!</p >
+                <label>Brightness</label>
+                <input type="range" id="brightnessSlider" min="0" max="200" value="100" oninput="applyFilter()">
+                <label>Contrast</label>
+                <input type="range" id="contrastSlider" min="0" max="200" value="100" oninput="applyFilter()">
+                <label>Saturation</label>
+                <input type="range" id="saturationSlider" min="0" max="200" value="100" oninput="applyFilter()">
+                <label>Grayscale</label>
+                <input type="range" id="grayscaleSlider" min="0" max="100" value="0" oninput="applyFilter()">
+
+                <div class="draft-buttons">
+                    <button onclick="saveDraft()">Save Draft</button>
+                    <button onclick="loadDraft()">Load Draft</button>
+                    <button onclick="clearAll()">Clear All</button>
+                </div>
+            </div>
+
+            <div>
+                <div class="card">
+                    <h2>Preview Canvas (Drag Text)</h2>
+                    <canvas id="previewCanvas" width="1080" height="1080"></canvas>
+                    <br>
+                    <button onclick="downloadImage()">📥 Download Final Image</button>
+                </div>
+                <div class="card" style="margin-top:28px;">
+                    <h2>3. Popular Hashtags</h2>
+                    <p>Select your niche category</p >
+                    <div>
+                        <span class="tag-category-btn active" onclick="switchHashtag('business')">Small Business</span>
+                        <span class="tag-category-btn" onclick="switchHashtag('fitness')">Fitness</span>
+                        <span class="tag-category-btn" onclick="switchHashtag('beauty')">Beauty</span>
+                        <span class="tag-category-btn" onclick="switchHashtag('food')">Food</span>
+                        <span class="tag-category-btn" onclick="switchHashtag('gaming')">Gaming</span>
+                        <span class="tag-category-btn" onclick="switchHashtag('travel')">Travel</span>
+                        <span class="tag-category-btn" onclick="switchHashtag('pets')">Pets</span>
+                        <span class="tag-category-btn" onclick="switchHashtag('fashion')">Fashion</span>
+                    </div>
+                    <div class="hashtag-box" id="hashContainer">
+                    </div>
+                    <br>
+                    <button onclick="copyHash()">Copy All Hashtags</button>
+                </div>
+            </div>
+        </div>
+    </div>
+        <script>
+        const canvas = document.getElementById('previewCanvas');
+        const ctx = canvas.getContext('2d');
+        let uploadedImg = null;
+        let currentTagsText = "";
+        let currentTextSize = 48;
+        let textList = [];
+        let draggingTextIndex = -1;
+        let dragOffsetX = 0;
+        let dragOffsetY = 0;
+
+        const hashtagData = {
+            business: "#smallbusiness #tiktokmarketing #instagramtips #contentcreator #viralpost #onlineshop #socialmedia #trending",
+            fitness: "#fitness #workout #gym #healthylifestyle #fitnessmotivation #exercise #gymlife #health",
+            beauty: "#beauty #makeup #skincare #cosmetics #beautytips #makeuplook #skincareroutine #glowup",
+            food: "#foodie #food #cooking #foodlover #yummy #homemade #foodphotography #delicious",
+            gaming: "#gaming #gamer #videogames #gameplay #streamer #pcgaming #gamingcommunity #esports",
+            travel: "#travel #wanderlust #vacation #travelgram #instatravel #adventure #trip #explore",
+            pets: "#pets #doglover #catlover #petsofinstagram #cutepets #animallovers #doglife #catlife",
+            fashion: "#fashion #style #ootd #fashionstyle #outfit #streetstyle #fashioninspo #clothing"
+        };
+
+        function renderHashtagUI(tagString){
+            const container = document.getElementById("hashContainer");
+            container.innerHTML = "";
+            const tagList = tagString.split(" ");
+            tagList.forEach(tag=>{
+                const span = document.createElement("span");
+                span.className = "hashtag-item";
+                span.innerText = tag;
+                container.appendChild(span);
+            })
+            currentTagsText = tagString;
+        }
+
+        function switchHashtag(category){
+            document.querySelectorAll('.tag-category-btn').forEach(btn=>btn.classList.remove('active'));
+            event.target.classList.add('active');
+            renderHashtagUI(hashtagData[category]);
+        }
+
+        function setCanvasSize(w,h){
+            canvas.width = w;
+            canvas.height = h;
+            redrawAll();
+        }
+
+       function loadImage(event){
+    const file = event.target.files[0];
+    if(!file) return;
+    // ====== 新增：更新文件名显示 ======
+    const displaySpan = document.getElementById('fileDisplayText');
+    let fileName = file.name;
+    if(fileName.length > 22){
+        fileName = fileName.substring(0,19) + "...";
+    }
+    displaySpan.innerText = fileName;
+    // =================================
+    const reader = new FileReader();
+    reader.onload = function(e){
+        const img = new Image();
+        img.src = e.target.result;
+        img.onload = function(){
+            uploadedImg = img;
+            redrawAll();
+        }
+    }
+    reader.readAsDataURL(file);
+}
+
+        function redrawAll(){
+            ctx.fillStyle="#ffffff";
+            ctx.fillRect(0,0,canvas.width,canvas.height);
+            if(uploadedImg){
+                ctx.drawImage(uploadedImg,0,0,canvas.width,canvas.height);
+                applyFilter();
+            }
+            textList.forEach(t=>{
+                ctx.fillStyle = t.color;
+                ctx.font = `${t.size}px Segoe UI`;
+                ctx.fillText(t.text, t.x, t.y);
+            })
+        }
+
+        function applyFilter(){
+            const brightness = document.getElementById("brightnessSlider").value;
+            const contrast = document.getElementById("contrastSlider").value;
+            const saturation = document.getElementById("saturationSlider").value;
+            const grayscale = document.getElementById("grayscaleSlider").value;
+            ctx.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%) grayscale(${grayscale}%)`;
+            if(uploadedImg){
+                ctx.drawImage(uploadedImg,0,0,canvas.width,canvas.height);
+            }
+            ctx.filter = "none";
+            textList.forEach(t=>{
+                ctx.fillStyle = t.color;
+                ctx.font = `${t.size}px Segoe UI`;
+                ctx.fillText(t.text, t.x, t.y);
+            })
+        }
+
+        function updateTextSize(){
+            currentTextSize = document.getElementById("textSizeSlider").value;
+            document.getElementById("textSizeVal").innerText = currentTextSize;
+        }
+
+        function addText(){
+            const text = document.getElementById("textInput").value.trim();
+            const color = document.getElementById("colorPicker").value;
+            if(!text) return;
+            textList.push({
+                text:text,
+                color:color,
+                size:Number(currentTextSize),
+                x:40,
+                y:80
+            })
+            redrawAll();
+        }
+
+        function downloadImage(){
+            const link = document.createElement('a');
+            link.href = canvas.toDataURL("image/png");
+            link.download = "socialpost.png";
+            link.click();
+        }
+
+        async function removeImageBackground(){
+            if(!uploadedImg){
+                alert("Please upload an image first!");
+                return;
+            }
+            const statusEl = document.getElementById("bgRemoveStatus");
+            statusEl.innerHTML = "<span class='loading'>Removing background, please wait...</span>";
+            try{
+                const resultBlob = await imglyRemoveBackground(uploadedImg.src);
+                const newImg = new Image();
+                newImg.src = URL.createObjectURL(resultBlob);
+                newImg.onload = ()=>{
+                    uploadedImg = newImg;
+                    redrawAll();
+                    statusEl.innerHTML = "✅ Background removed successfully!";
+                }
+            }catch(err){
+                statusEl.innerHTML = "❌ Background remove failed, check your internet.";
+                console.error(err);
+            }
+        }
+
+        function copyHash(){
+            navigator.clipboard.writeText(currentTagsText).then(()=>{
+                alert("Hashtags copied!");
+            })
+        }
+
+        function getCanvasPos(e){
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            return {
+                x: (e.clientX - rect.left)*scaleX,
+                y: (e.clientY - rect.top)*scaleY
+            }
+        }
+        function hitTest(pt, textItem){
+            ctx.font = `${textItem.size}px Segoe UI`;
+            const m = ctx.measureText(textItem.text);
+            return pt.x >= textItem.x && pt.x <= textItem.x + m.width && pt.y >= textItem.y - textItem.size && pt.y <= textItem.y;
+        }
+
+        canvas.addEventListener('mousedown', (e)=>{
+            const p = getCanvasPos(e);
+            for(let i = textList.length - 1; i >=0; i--){
+                if(hitTest(p, textList[i])){
+                    draggingTextIndex = i;
+                    dragOffsetX = p.x - textList[i].x;
+                    dragOffsetY = p.y - textList[i].y;
+                    break;
+                }
+            }
+        })
+        canvas.addEventListener('mousemove', (e)=>{
+            if(draggingTextIndex === -1) return;
+            const p = getCanvasPos(e);
+            textList[draggingTextIndex].x = p.x - dragOffsetX;
+            textList[draggingTextIndex].y = p.y - dragOffsetY;
+            redrawAll();
+        })
+        canvas.addEventListener('mouseup', ()=>{
+            draggingTextIndex = -1;
+        })
+        canvas.addEventListener('mouseleave', ()=>{
+            draggingTextIndex = -1;
+        })
+
+        function saveDraft(){
+            const draftData = {
+                textList: textList,
+                brightness: document.getElementById("brightnessSlider").value,
+                contrast: document.getElementById("contrastSlider").value,
+                saturation: document.getElementById("saturationSlider").value,
+                grayscale: document.getElementById("grayscaleSlider").value
+            }
+            localStorage.setItem("socialpost_draft", JSON.stringify(draftData));
+            alert("✅ Draft saved!");
+        }
+        function loadDraft(){
+            const raw = localStorage.getItem("socialpost_draft");
+            if(!raw){
+                alert("No saved draft found.");
+                return;
+            }
+            const draftData = JSON.parse(raw);
+            textList = draftData.textList;
+            document.getElementById("brightnessSlider").value = draftData.brightness;
+            document.getElementById("contrastSlider").value = draftData.contrast;
+            document.getElementById("saturationSlider").value = draftData.saturation;
+            document.getElementById("grayscaleSlider").value = draftData.grayscale;
+            redrawAll();
+            alert("✅ Draft loaded!");
+        }
+       function clearAll(){
+    uploadedImg = null;
+    textList = [];
+
+    //重置滤镜滑块回到默认值
+    document.getElementById('brightnessSlider').value = 100;
+    document.getElementById('contrastSlider').value = 100;
+    document.getElementById('saturationSlider').value = 100;
+    document.getElementById('grayscaleSlider').value = 0;
+
+    //重置文件名显示
+    document.getElementById('fileDisplayText').innerText = "No file selected";
+
+    applyFilter();
+    redrawAll();
+}
+
+        renderHashtagUI(hashtagData.business);
+    </script>
+</body>
+</html>

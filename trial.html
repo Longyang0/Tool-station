@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SocialPost Maker Editor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background-color: #f3f4f6;
+            padding: 20px;
+        }
+
+        .back-btn {
+            margin-bottom: 20px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .back-btn button {
+            width: auto;
+        }
+
+        .wrap {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 24px;
+            max-width: 1200px;
+            margin: 0 auto;
+            align-items: start;
+        }
+
+        .panel {
+            background: white;
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px #00000018;
+        }
+
+        .panel h3 {
+            margin-bottom: 16px;
+            color: #333;
+        }
+
+        .template-item {
+            display: block;
+            padding: 8px;
+            margin: 6px 0;
+            background: #f3f4f6;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            margin: 8px 0 16px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            background: #6b21a8;
+            color: white;
+            border-radius: 10px;
+            margin: 8px 0;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0 16px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        /* ========== 预览卡片区域 ========== */
+        .preview-card {
+            background: white;
+            border-radius: 18px;
+            padding: 18px;
+            box-shadow: 0 2px 12px #00000018;
+            position: relative;
+        }
+
+        .preview-card h3 {
+            margin-bottom: 12px;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .preview-stage {
+            background: #ffffff;
+            border-radius: 14px;
+            aspect-ratio: 1 / 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #eee;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #previewCanvas {
+            max-width: 100%;
+            max-height: 100%;
+            cursor: move;
+            border-radius: 10px;
+        }
+
+        /* 悬浮下载按钮 */
+        .download-float-btn {
+            position: absolute;
+            left: 18px;
+            bottom: 18px;
+            background: #b14cff;
+            color: white;
+            border: none;
+            padding: 10px 14px;
+            border-radius: 999px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 6px 18px #b14cff55;
+            width: auto;
+            z-index: 5;
+        }
+
+        .tag-category-btn {
+            display: inline-block;
+            padding: 6px 10px;
+            margin: 4px;
+            background: #eee;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .tag-category-btn.active {
+            background: #6b21a8;
+            color: white;
+        }
+
+        .hashtag-item {
+            display: inline-block;
+            padding: 4px 8px;
+            background: #f3f4f6;
+            border-radius: 6px;
+            margin: 3px;
+            font-size: 14px;
+        }
+
+        /* ========== 自定义Choose File按钮样式 ========== */
+        .file-area {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 8px;
+        }
+
+        .file-hidden-input {
+            display: none;
+        }
+
+        .file-btn {
+            width: auto;
+            padding: 6px 12px;
+            margin: 0;
+        }
+
+        #fileDisplayText {
+            white-space: nowrap;
+            overflow: hidden;
+            color: #555;
+        }
+
+        /* 弹窗遮罩 */
+        .modal-overlay{
+            position:fixed;
+            inset:0;
+            background:rgba(0,0,0,0.5);
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            z-index:99;
+            display:none;
+        }
+        .modal-box{
+            background:white;
+            padding:30px;
+            border-radius:16px;
+            width:360px;
+            text-align:center;
+        }
+        .modal-box h4{
+            font-size:20px;
+            margin-bottom:12px;
+        }
+        .modal-box p{
+            color:#666;
+            margin-bottom:20px;
+        }
+        .modal-btn-group{
+            display:flex;
+            gap:10px;
+        }
+        .modal-btn-group button{
+            width:50%;
+        }
+    </style>
+</head>
+<body>
+    <!-- 付费提示弹窗 -->
+   <div class="modal-overlay" id="payModal">
+    <div class="modal-box">
+        <h4>💧 Free Version Watermark</h4>
+        <p>Your exported image will contain watermark. Purchase the full product to get watermark-free images, and enjoy unlimited access to all features!</p >
+        <div class="modal-btn-group">
+            <button onclick="closeModal()">Cancel</button>
+            <button onclick="freeDownload()">Download (With Watermark)</button>
+            <button onclick="goToCheckout()">Buy Premium</button>
+        </div>
+    </div>
+</div>
+
+    <div class="back-btn">
+        <a href="index.html"><button>← back home</button></a >
+    </div>
+
+    <div class="wrap">
+        <!-- 左侧工具面板 -->
+        <div class="panel">
+            <h3>Canvas Template</h3>
+            <div class="template-item" onclick="setCanvasSize(1080,1080)">Instagram Post (1080×1080)</div>
+            <div class="template-item" onclick="setCanvasSize(1080,1920)">TikTok / IG Story (1080×1920)</div>
+            <div class="template-item" onclick="setCanvasSize(1200,630)">Facebook Post (1200×630)</div>
+
+            <h3>Upload Image</h3>
+            <div class="file-area">
+                <button class="file-btn" onclick="document.getElementById('imgUpload').click()">Choose File</button>
+                <span id="fileDisplayText">No file selected</span>
+            </div>
+            <input type="file" id="imgUpload" class="file-hidden-input" accept="image/*" onchange="loadImage(event)">
+
+            <h3>Add Text</h3>
+            <input type="text" id="textInput" placeholder="Enter your text">
+            <label>Text Color</label>
+            <input type="color" id="colorPicker" value="#ffffff">
+            <label>Text Size: <span id="textSizeVal">48</span></label>
+            <input type="range" id="textSizeSlider" min="12" max="120" value="48" oninput="updateTextSize()">
+            <button onclick="addText()">Add Text</button>
+
+            <h3>Hashtag Library</h3>
+            <div>
+                <span class="tag-category-btn active" onclick="switchHashtag('business')">Business</span>
+                <span class="tag-category-btn" onclick="switchHashtag('fitness')">Fitness</span>
+                <span class="tag-category-btn" onclick="switchHashtag('beauty')">Beauty</span>
+                <span class="tag-category-btn" onclick="switchHashtag('food')">Food</span>
+                <span class="tag-category-btn" onclick="switchHashtag('gaming')">Gaming</span>
+                <span class="tag-category-btn" onclick="switchHashtag('travel')">Travel</span>
+                <span class="tag-category-btn" onclick="switchHashtag('pets')">Pets</span>
+                <span class="tag-category-btn" onclick="switchHashtag('fashion')">Fashion</span>
+            </div>
+            <div id="hashContainer" style="margin:12px 0;"></div>
+            <button onclick="copyHash()">Copy Hashtags</button>
+
+            <h3>Actions</h3>
+            <button onclick="clearAll()">Clear All</button>
+        </div>
+
+        <!-- 右侧预览卡片 -->
+        <div>
+            <div class="preview-card">
+                <h3>Preview Canvas (Drag Text)</h3>
+                <div class="preview-stage">
+                    <canvas id="previewCanvas" width="1080" height="1080"></canvas>
+                </div>
+                <button id="downloadBtn" class="download-float-btn" onclick="handleDownload()">
+                    Download Final Image
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===================== 付费状态变量 =====================
+        // false = 免费用户（带水印），true = 付费会员（无水印）
+        let isPaidUser = false;
+
+        const canvas = document.getElementById('previewCanvas');
+        const ctx = canvas.getContext('2d');
+        let uploadedImg = null;
+        let currentTagsText = "";
+        let currentTextSize = 48;
+        let textList = [];
+        let draggingTextIndex = -1;
+        let dragOffsetX = 0;
+        let dragOffsetY = 0;
+        const payModal = document.getElementById("payModal");
+
+
+        // 点击下载的总入口
+        function handleDownload(){
+            if(!isPaidUser){
+                // 免费用户：弹出提示，可以下载但是带水印
+                payModal.style.display = "flex";
+                return;
+            }
+            // 付费用户：直接下载干净图片
+            downloadImage(false);
+        }
+
+        function closeModal(){
+            payModal.style.display = "none";
+        }
+
+        function goToCheckout(){
+            // 替换为你的支付页面链接
+            alert("Redirect to payment checkout page");
+            closeModal();
+        }
+
+        // 免费用户下载，带水印
+        function freeDownload(){
+            closeModal();
+            downloadImage(true);
+        }
+
+        // downloadImage(hasWatermark)
+        function downloadImage(hasWatermark) {
+            // 创建临时画布，用来导出（避免破坏预览画布）
+            const exportCanvas = document.createElement('canvas');
+            exportCanvas.width = canvas.width;
+            exportCanvas.height = canvas.height;
+            const exportCtx = exportCanvas.getContext('2d');
+
+            // 复制原图内容
+            exportCtx.drawImage(canvas,0,0);
+
+            // 如果开启水印
+            if(hasWatermark){
+                exportCtx.fillStyle = "rgba(255,255,255,0.45)";
+                exportCtx.font = `${canvas.width * 0.04}px Segoe UI`;
+                exportCtx.fillText("Created with SocialPost Maker", 30, exportCanvas.height - 30);
+            }
+
+            const link = document.createElement('a');
+            link.href = exportCanvas.toDataURL("image/png");
+            link.download = hasWatermark ? "socialpost_free.png" : "socialpost_premium.png";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        const hashtagData = {
+            business: "#smallbusiness #tiktokmarketing #instagramtips #contentcreator #viralpost #onlineshop #socialmedia #trending",
+            fitness: "#fitness #workout #gym #healthylifestyle #fitnessmotivation #exercise #gymlife #health",
+            beauty: "#beauty #makeup #skincare #cosmetics #beautytips #makeuplook #skincareroutine #glowup",
+            food: "#foodie #food #cooking #foodlover #yummy #homemade #foodphotography #delicious",
+            gaming: "#gaming #gamer #videogames #gameplay #streamer #pcgaming #gamingcommunity #esports",
+            travel: "#travel #wanderlust #vacation #travelgram #adventure #trip #explore #instatravel",
+            pets: "#pets #doglover #catlover #petsofinstagram #cutepets #animallovers #doglife #catlife",
+            fashion: "#fashion #style #ootd #fashionstyle #outfit #streetstyle #fashioninspo #clothing"
+        };
+
+        function renderHashtagUI(tagString) {
+            const container = document.getElementById("hashContainer");
+            container.innerHTML = "";
+            const tags = tagString.split(" ");
+            tags.forEach(tag => {
+                const span = document.createElement("span");
+                span.className = "hashtag-item";
+                span.innerText = tag;
+                container.appendChild(span);
+            })
+            currentTagsText = tagString;
+        }
+
+        function switchHashtag(category) {
+            document.querySelectorAll('.tag-category-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            renderHashtagUI(hashtagData[category]);
+        }
+
+        function setCanvasSize(w, h) {
+            canvas.width = w;
+            canvas.height = h;
+            redrawCanvas();
+        }
+
+        function loadImage(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            document.getElementById("fileDisplayText").innerText = file.name;
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const img = new Image();
+                img.src = e.target.result;
+                img.onload = function () {
+                    uploadedImg = img;
+                    redrawCanvas();
+                }
+            }
+            reader.readAsDataURL(file);
+        }
+
+        function redrawCanvas() {
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            if (uploadedImg) {
+                ctx.drawImage(uploadedImg, 0, 0, canvas.width, canvas.height);
+            }
+
+            textList.forEach(item => {
+                ctx.fillStyle = item.color;
+                ctx.font = `${item.size}px Segoe UI`;
+                ctx.fillText(item.text, item.x, item.y);
+            })
+        }
+
+        function updateTextSize() {
+            currentTextSize = document.getElementById("textSizeSlider").value;
+            document.getElementById("textSizeVal").innerText = currentTextSize;
+        }
+
+        function addText() {
+            const inputText = document.getElementById("textInput").value.trim();
+            const color = document.getElementById("colorPicker").value;
+            if (!inputText) return;
+
+            textList.push({
+                text: inputText,
+                color: color,
+                size: Number(currentTextSize),
+                x: 40,
+                y: 80
+            });
+
+            redrawCanvas();
+        }
+
+        function copyHash() {
+            navigator.clipboard.writeText(currentTagsText).then(() => {
+                alert("Hashtags copied!");
+            })
+        }
+
+        function clearAll() {
+            uploadedImg = null;
+            textList = [];
+            document.getElementById("fileDisplayText").innerText = "No file selected";
+            redrawCanvas();
+        }
+
+        // 拖拽文字
+        canvas.addEventListener('mousedown', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const mouseX = (e.clientX - rect.left) * scaleX;
+            const mouseY = (e.clientY - rect.top) * scaleY;
+
+            for (let i = textList.length - 1; i >= 0; i--) {
+                const t = textList[i];
+                ctx.font = `${t.size}px Segoe UI`;
+                const textWidth = ctx.measureText(t.text).width;
+
+                if (
+                    mouseX >= t.x &&
+                    mouseX <= t.x + textWidth &&
+                    mouseY >= t.y - t.size &&
+                    mouseY <= t.y
+                ) {
+                    draggingTextIndex = i;
+                    dragOffsetX = mouseX - t.x;
+                    dragOffsetY = mouseY - t.y;
+                    break;
+                }
+            }
+        });
+         canvas.addEventListener('mousemove', (e) => {
+            if (draggingTextIndex === -1) return;
+
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const mouseX = (e.clientX - rect.left) * scaleX;
+            const mouseY = (e.clientY - rect.top) * scaleY;
+
+            textList[draggingTextIndex].x = mouseX - dragOffsetX;
+            textList[draggingTextIndex].y = mouseY - dragOffsetY;
+
+            redrawCanvas();
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            draggingTextIndex = -1;
+        });
+
+        canvas.addEventListener('mouseleave', () => {
+            draggingTextIndex = -1;
+        });
+
+        renderHashtagUI(hashtagData.business);
+    </script>
+</body>
+</html>

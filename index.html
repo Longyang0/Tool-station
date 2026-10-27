@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SocialPost Maker | Lifetime One-Time Purchase</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            background-color: #f4f5f7;
+            color: #222;
+        }
+        header {
+            background: linear-gradient(135deg, #7b2cbf, #ff4d94);
+            color: white;
+            padding: 60px 20px;
+            text-align: center;
+        }
+        h1 {
+            font-size: 42px;
+            margin-bottom:16px;
+        }
+        .slogan{
+            font-size:20px;
+            max-width:700px;
+            margin:0 auto 32px;
+            opacity:0.95;
+        }
+        .btn-open{
+            background:#ffffff;
+            color:#7b2cbf;
+            text-decoration:none;
+            font-weight:bold;
+            padding:14px 32px;
+            border-radius:10px;
+            display:inline-block;
+            font-size:18px;
+        }
+        .btn-open:hover{
+            background:#f0f0f0;
+        }
+        .container{
+            max-width:1100px;
+            margin:0 auto;
+            padding:50px 20px;
+        }
+        h2{
+            text-align:center;
+            font-size:30px;
+            margin-bottom:36px;
+            color:#7b2cbf;
+        }
+        .feature-grid{
+            display:grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px,1fr));
+            gap:24px;
+        }
+        .feature-card{
+            background:white;
+            padding:24px;
+            border-radius:16px;
+            box-shadow:0 4px 14px #00000018;
+        }
+        .feature-card h3{
+            margin-bottom:10px;
+            color:#7b2cbf;
+        }
+        .price-box{
+            background:#fff;
+            max-width:500px;
+            margin:50px auto;
+            padding:36px;
+            border-radius:18px;
+            text-align:center;
+            box-shadow:0 4px 14px #00000018;
+        }
+        .price{
+            font-size:44px;
+            font-weight:bold;
+            color:#7b2cbf;
+            margin:12px 0;
+        }
+        .disclaimer{
+            margin-top:40px;
+            font-size:13px;
+            color:#555;
+            line-height:1.6;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>SocialPost Maker</h1>
+        <div class="slogan">Create stunning posts for TikTok, Instagram & Facebook. One-time lifetime payment, NO monthly subscriptions.</div>
+        <a class="btn-open" href="trial.html">Open The Tool</a >
+    </header>
+    <div class="container">
+        <h2>Powerful Features</h2>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <h3>📐 Ready Templates</h3>
+                <p>Predefined sizes for Instagram, TikTok Story and Facebook posts.</p >
+            </div>
+            <div class="feature-card">
+                <h3>🖼️ Image Editor</h3>
+                <p>Upload your image, add custom text and adjust text color.</p >
+            </div>
+            <div class="feature-card">
+                <h3>🏷️ Hashtag Library</h3>
+                <p>Copy popular niche hashtags in one click for your content.</p >
+            </div>
+            <div class="feature-card">
+                <h3>💾 Download Image</h3>
+                <p>Export your finished design directly to your computer.</p >
+        </div>
+        </div>
+        <div class="price-box">
+            <h3>Lifetime License</h3>
+            <div class="price">$29</div>
+            <p>Pay once, use forever. No recurring fees.</p >
+                <p>🔥 Early Bird Special: Limited Time Offer, price will rise to $49 soon!</p >
+     <p>✅ Lifetime License | Continuous Updates</p >
+     <p>✅ 14‑Day Money‑Back Guarantee</p >
+            <br>
+            <a class="btn-open" href="javascript:void(0)" onclick="openTool()">Try The Tool</a >
+        </div>
+        <div class="disclaimer">
+            <strong>Disclaimer:</strong> This tool provides design templates. You are responsible for copyright of all images you create. Do not use copyrighted materials without permission.
+        </div>
+
+    </div>
+    <script>
+async function openTool(){
+    const savedLicense = localStorage.getItem("licenseKey");
+
+    if(!savedLicense){
+        const userKey = prompt("Please enter your license key after purchase:");
+        if(!userKey) return;
+        const result = await checkLicense(userKey);
+        if(result.valid){
+            localStorage.setItem("licenseKey", userKey);
+            alert("License verified successfully!");
+            location.href = "socialpost.html";
+        }else{
+            alert("Invalid license key!");
+        }
+    }else{
+        const result = await checkLicense(savedLicense);
+        if(result.valid){
+            location.href = "socialpost.html";
+        }else{
+            alert("License invalid, please re-enter.");
+            localStorage.removeItem("licenseKey");
+        }
+    }
+}
+
+async function checkLicense(key){
+    const res = await fetch("/api/verify-license",{
+        method:"POST",
+        headers:{
+            "Content-Type":"application/json"
+        },
+        body:JSON.stringify({license_key: key})
+    })
+    return await res.json();
+}
+</script>
+<div class="contact-section" style="margin-top:60px;padding:30px;border:1px solid #eee;border-radius:12px;">
+
+        <h3>Contact Me</h3>
+        <p>If you have any suggestions or ideas, please don’t hesitate to reach out.</p >
+
+        <form action="https://formsubmit.co/2813252791@qq.com" method="POST">
+            <label>Your Name</label>
+            <input type="text" name="name" required style="width:100%;padding:8px;margin:8px 0;">
+
+            <label>Your Email</label>
+            <input type="email" name="email" required style="width:100%;padding:8px;margin:8px 0;">
+
+            <label>Your Message</label>
+            <textarea name="message" rows="4" required style="width:100%;padding:8px;margin:8px 0;"></textarea>
+
+            <button type="submit" style="padding:10px 20px;background:#2563eb;color:white;border:none;border-radius:8px;margin-top:10px;">
+                Send Message
+            </button>
+        </form>
+
+        <p style="margin-top:20px;" title="if you have any ideas or suggestions,feel free to contact us.">My Email: <a href="maito">2813252791@qq.com</a ></p >
+
+    </div>
+    <!-- 表单结束 -->
+</body>
+</html>
